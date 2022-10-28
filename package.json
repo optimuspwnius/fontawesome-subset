@@ -1,8 +1,7 @@
 {
   "name": "@optimuspwnius/fontawesome-subset",
-  "version": "6.0.0",
-  "description": "Utility to create subsets for FontAwesome 6 (Free and Pro) for use with Ruby on Rails + Propshaft.",
-  "type": "module",
+  "version": "3.0.45",
+  "description": "Utility to create subsets for FontAwesome and FontAwesome Pro with Ruby on Rails + Propshaft.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,11 +10,12 @@
     "src/*"
   ],
   "dependencies": {
-    "arg": "^5.0.2",
-    "chokidar": "^3.5.3",
-    "fast-glob": "^3.2.12",
-    "fontawesome-subset": "^4.0.0",
-    "sass": "^1.55.0"
+    "arg": "^5.0.1",
+    "chokidar": "^3.5.2",
+    "esm": "^3.2.25",
+    "fast-glob": "^3.2.7",
+    "fontawesome-subset": "^3.0.0",
+    "sass": "^1.42.1"
   },
   "license": "MIT",
   "repository": {
@@ -30,16 +30,19 @@
     "subset",
     "subsetter",
     "icon font",
-    "optimize",
-    "ruby",
-    "rails",
-    "ruby on rails",
-    "propshaft"
+    "optimize"
   ],
   "devDependencies": {
+    "@types/mkdirp": "^1.0.2",
+    "@types/node": "^16.9.1",
+    "@types/svg2ttf": "^5.0.1",
+    "@types/ttf2eot": "^2.0.0",
+    "@types/ttf2woff": "^2.0.2",
+    "@types/ttf2woff2": "^2.0.0",
+    "typescript": "^4.4.3"
   },
   "bin": {
-    "subset": "bin/subset.js"
+    "subset": "bin/subset"
   },
   "bugs": {
     "url": "https://github.com/optimuspwnius/fontawesome-subset/issues"

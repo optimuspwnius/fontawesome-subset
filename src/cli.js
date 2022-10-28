@@ -7,7 +7,6 @@ import fs from 'fs'
 import arg from 'arg'
 import path from 'path'
 import sass from 'sass'
-import yaml from 'yaml'
 
 function parseArgumentsIntoOptions(rawArgs) {
   const args = arg(
@@ -27,7 +26,7 @@ function parseArgumentsIntoOptions(rawArgs) {
   };
  }
 
-export default function RailsFontAwesomeSubset(args) {
+export function cli(args) {
 
   let options = parseArgumentsIntoOptions(args)
 
@@ -59,7 +58,6 @@ async function copyAssets(options) {
 
     let results = [...content.matchAll(/icon\(:(?<type>fa[sbltrd]), :(?<name>[a-z|_]*)[,)]/gm)]
 
-    // TODO: Add new font sharp
     for (let result of results) {
 
       let icon_type = null
@@ -99,32 +97,26 @@ async function copyAssets(options) {
 
   let fontawesomePath = 'node_modules/@fortawesome/fontawesome-' + (options.pro ? 'pro' : 'free') + '/'
 
-  let scss = fs.readFileSync(path.resolve(fontawesomePath + 'scss/_functions.scss'), 'utf-8')
-
-  scss += fs.readFileSync(path.resolve(fontawesomePath + 'scss/_variables.scss'), 'utf-8').replace(new RegExp('\$fa-icons\: \(.*\)\;'), '')
+  let scss = fs.readFileSync(path.resolve(fontawesomePath + 'scss/_variables.scss'), 'utf-8')
 
   scss += '\n$fa-font-path: "fonts";\n\n'
 
-  scss += scss + fs.readFileSync(path.resolve(fontawesomePath + 'scss/_mixins.scss'), 'utf-8')
+  scss += scss = fs.readFileSync(path.resolve(fontawesomePath + 'scss/_mixins.scss'), 'utf-8')
 
-  let metadata = yaml.parse(fs.readFileSync(path.resolve(fontawesomePath + 'metadata/icons.yml'), 'utf-8'))
+  // Copy stylesheets
+  const partialSCSSFiles = fastGlob.sync([fontawesomePath + 'scss/_*',
+                          '!' + fontawesomePath + 'scss/v4-shims.scss',
+                          '!' + fontawesomePath + 'scss/_shims.scss',
+                          '!' + fontawesomePath + 'scss/_variables.scss',
+                          '!' + fontawesomePath + 'scss/_icons.scss',
+                          '!' + fontawesomePath + 'scss/_mixins.scss'])
   
-  // I want keys to be the icon name as well as it's aliases names and the value as icon types (brand, solid, duotone, etc)
-  let iconAliases = { }
-  
-  Object.keys(metadata).forEach(key => {
-    iconAliases[key] = metadata[key].styles
-    
-    if (metadata[key].aliases !== undefined && metadata[key].aliases.names !== undefined)
-    for (let alias of metadata[key].aliases.names) {
-        iconAliases[alias] = metadata[key].styles
-      }
-  })
-  
-  // Update _variables.scss
-  let generalIcons = '$fa-icons: (\n'
+  for (let file of partialSCSSFiles)
+    scss += fs.readFileSync(path.resolve(file), 'utf-8')
 
-  let brandIcons = '$fa-brand-icons: (\n'
+  // Update _icons.scss
+  
+  scss += '$icons: (\n'
 
   let aggregateIcons = []
 
@@ -133,29 +125,11 @@ async function copyAssets(options) {
   })
 
   let uniqueIcons = [...new Set(aggregateIcons)]
-  
-  for (let icon of uniqueIcons) {
-    if (iconAliases[icon].includes('brands'))
-      brandIcons += '  ' + icon + ': $fa-var-' + icon + ',\n'
-    else
-      generalIcons += '  ' + icon + ': $fa-var-' + icon + ',\n'
-  }
 
-  generalIcons += ');'
-  
-  brandIcons += ');'
+  for (let icon of uniqueIcons)
+    scss += '  ' + icon + ': $fa-var-' + icon + ',\n'
 
-  scss += generalIcons + brandIcons
-    // Copy stylesheets, except (!) for certain ones that we need to generate dynamically
-  const partialSCSSFiles = fastGlob.sync([fontawesomePath + 'scss/_*',
-    '!' + fontawesomePath + 'scss/v4-shims.scss',
-    '!' + fontawesomePath + 'scss/_shims.scss',
-    '!' + fontawesomePath + 'scss/_variables.scss',
-    '!' + fontawesomePath + 'scss/_mixins.scss'])
-    //'!' + fontawesomePath + 'scss/_icons.scss',
-
-  for (let file of partialSCSSFiles)
-    scss += fs.readFileSync(path.resolve(file), 'utf-8')
+  scss += ');\n\n@each $key, $value in $icons {\n  .#{$fa-css-prefix}-#{$key}:before {\n    content: fa-content($value);\n  }\n}\n'
 
   // Create font faces
 
@@ -164,7 +138,23 @@ async function copyAssets(options) {
   for (let font of uniqueFonts) {
     let content = fs.readFileSync(path.resolve(fontawesomePath + 'scss/' + font + '.scss'), 'utf-8')
 
-    content = content.replace("@import 'variables';", '').replace("@import 'functions';", '')
+    content = content.replace("@import 'variables';", '')
+
+    if (font === 'duotone') {
+      // Unescaped regex
+      //let duotones = content.match(/\.fad\.#{\$fa-css-prefix}-${icons[font].join('|')}:after { content: fa-content\(\\[a-z0-9]*\); }\n/g)
+
+      // Escaped regex
+      let duotoneRegex = new RegExp('\\.fad\\.#{\\$fa-css-prefix}-(' + icons[font].join('|') + '):after { content: fa-content\\(\\\\[a-z0-9]*\\); }\\n', 'g');
+
+      let duotones = content.match(duotoneRegex)
+      
+      content = content.replaceAll(/\.fad\.#{\$fa-css-prefix}-[a-z0-9-]*:after { content: fa-content\(\\[a-z0-9]*\); }\n/g, '')
+      
+      if (duotones.length > 0)
+        content += duotones.join('\n')
+      
+    }
 
     scss += content
   }
@@ -180,7 +170,7 @@ async function copyAssets(options) {
 
 async function startWatcher(options) {
   
-  let watcher = chokidar.watch(['app/views/**/*.slim', 'app/helpers/**/*.rb'], { ignoreInitial: true })
+  let watcher = chokidar.watch(['app/views/**/*.slim'], { ignoreInitial: true })
 
   watcher.on('change', async (file) => {
     copyAssets(options)
