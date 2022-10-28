@@ -1,6 +1,6 @@
 {
   "name": "@optimuspwnius/fontawesome-subset",
-  "version": "3.0.45",
+  "version": "5.0.1",
   "description": "Utility to create subsets for FontAwesome and FontAwesome Pro with Ruby on Rails + Propshaft.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
