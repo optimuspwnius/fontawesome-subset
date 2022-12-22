@@ -15,7 +15,9 @@ function parseArgumentsIntoOptions(rawArgs) {
       '--watch': Boolean,
       '-w': '--watch',
       '--pro': Boolean,
-      '-p': '--pro'
+      '-p': '--pro',
+      '--minify': Boolean,
+      '-m': '--minify'
     },
     {
       argv: rawArgs.slice(2),
@@ -24,6 +26,7 @@ function parseArgumentsIntoOptions(rawArgs) {
   return {
     watch: args['--watch'] || false,
     pro: args['--pro'] || false,
+    minify: args['--minify'] || false
   };
  }
 
@@ -57,7 +60,9 @@ async function copyAssets(options) {
   for (let file of templateFiles) {
     let content = fs.readFileSync(path.resolve(file), 'utf8')
 
-    let results = [...content.matchAll(/icon\(:(?<type>fa[sbltrd]), :(?<name>[a-z|_]*)[,)]/gm)]
+    // In our app we are looking for instances of "= icon(:fas, :file)"
+    // The regex will match 'fas' and 'file' so it can subset them.
+    let results = [...content.matchAll(/icon\s?\(?:(?<type>(fas|fab|fal|fat|far|fad|fass)),\s*:(?<name>[a-z|_-]*)[,)]/gm)]
 
     // TODO: Add new font sharp
     for (let result of results) {
@@ -79,6 +84,9 @@ async function copyAssets(options) {
           break
         case 'fad':
           icon_type = 'duotone'
+          break
+        case 'fass':
+          icon_type = 'sharp'
           break
       }
       let icon_name = result.groups.name.replaceAll('_', '-')
@@ -169,8 +177,8 @@ async function copyAssets(options) {
     scss += content
   }
 
-  const result = sass.renderSync({ data: scss, quietDeps: true, verbose: false })
-
+  const result = sass.compileString(scss, { style: options.minify ? "compressed" : "expanded" })
+  
   fs.writeFileSync(path.resolve('app/assets/builds/fontawesome-pro.css'), result.css.toString())
 
   console.log('Done.')
