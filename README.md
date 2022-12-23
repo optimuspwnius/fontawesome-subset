@@ -6,11 +6,25 @@ It's like TailwindCSS but for FontAwesome!
 
 In Procfile.dev add
 
-    fontawesome: yarn build:fontawesome --watch --minify
+    fontawesome: yarn build:fontawesome --watch
 
 In package.json under "scripts" add
 
-    "build:fontawesome": "subset --pro --minify"
+    "build:fontawesome": "subset"
+
+Some options you can add to the build:fontawesome subset command are:
+
+Use Font Awesome Pro (requires subscription and your npm token to be setup beforehand)
+
+    "build:fontawesome": "subset --pro"
+
+Remove all whitespace to make the file as small as possible. This option just adds the style="compressed" option to the sass compiler when it builds the output file.
+
+    "build:fontawesome": "subset --minify"
+
+Sets the output path and filename. The default is app/assets/builds/fontawesome.css
+
+    "build:fontawesome": "subset --output app/assets/myfonts.css"
 
 Create lib/tasks/build.rake and add the following
 
@@ -51,6 +65,10 @@ Add this to your helper in app/helpers/application_helper.rb
 
       html.html_safe
     end
+
+Reference the stylesheet in your layout:
+
+    = stylesheet_link_tag 'fontawesome'
 
 After installation, run your proc file which will watch your development app and create icon subsets on the fly. In production during deploy your app should automatically run the rake task build:fontawesome and create the icon subsets and css.
 

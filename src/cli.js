@@ -17,7 +17,9 @@ function parseArgumentsIntoOptions(rawArgs) {
       '--pro': Boolean,
       '-p': '--pro',
       '--minify': Boolean,
-      '-m': '--minify'
+      '-m': '--minify',
+      '--output': String,
+      '-o': '--output'
     },
     {
       argv: rawArgs.slice(2),
@@ -26,7 +28,8 @@ function parseArgumentsIntoOptions(rawArgs) {
   return {
     watch: args['--watch'] || false,
     pro: args['--pro'] || false,
-    minify: args['--minify'] || false
+    minify: args['--minify'] || false,
+    output: args['--output'] || 'app/assets/builds/fontawesome.css'
   };
  }
 
@@ -179,7 +182,7 @@ async function copyAssets(options) {
 
   const result = sass.compileString(scss, { style: options.minify ? "compressed" : "expanded" })
   
-  fs.writeFileSync(path.resolve('app/assets/builds/fontawesome-pro.css'), result.css.toString())
+  fs.writeFileSync(path.resolve(options.output), result.css.toString())
 
   console.log('Done.')
 
