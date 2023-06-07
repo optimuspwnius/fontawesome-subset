@@ -1,6 +1,6 @@
 {
   "name": "@optimuspwnius/fontawesome-subset",
-  "version": "6.0.3",
+  "version": "6.0.4",
   "description": "Utility to create subsets for Font Awesome 6 (Free and Pro) for use with Ruby on Rails + Propshaft.",
   "type": "module",
   "scripts": {

@@ -56,7 +56,7 @@ async function copyAssets(options) {
 
   console.log('Extracting icons from templates...')
   
-  const templateFiles = fastGlob.sync(['app/views/**/*', 'app/helpers/**/*'])
+  const templateFiles = fastGlob.sync(['app/views/**/*', 'app/helpers/**/*', 'app/components/**/*'])
 
   let icons = { }
 
@@ -191,7 +191,7 @@ async function copyAssets(options) {
 
 async function startWatcher(options) {
   
-  let watcher = chokidar.watch(['app/views/**/*.slim', 'app/helpers/**/*.rb'], { ignoreInitial: true })
+  let watcher = chokidar.watch(['app/views/**/*.slim', 'app/helpers/**/*.rb', 'app/components/**/*.slim'], { ignoreInitial: true })
 
   watcher.on('change', async (file) => {
     copyAssets(options)
