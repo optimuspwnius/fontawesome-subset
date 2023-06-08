@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [6.0.5](https://github.com/optimuspwnius/fontawesome-subset/releases/tag/6.0.5)
+
+Locking sass to 1.62.1
+
 ## [6.0.4](https://github.com/optimuspwnius/fontawesome-subset/releases/tag/6.0.4)
 
 Added app/components directory to the watch list

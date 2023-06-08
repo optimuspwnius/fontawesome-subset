@@ -15,7 +15,7 @@
     "chokidar": "^3.5.3",
     "fast-glob": "^3.2.12",
     "fontawesome-subset": "^4.0.0",
-    "sass": "^1.55.0"
+    "sass": "1.62.1"
   },
   "license": "MIT",
   "repository": {
