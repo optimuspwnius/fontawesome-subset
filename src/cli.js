@@ -6,7 +6,7 @@ import fastGlob from 'fast-glob'
 import fs from 'fs'
 import arg from 'arg'
 import path from 'path'
-import sass from 'sass'
+import * as sass from 'sass'
 import yaml from 'yaml'
 
 function parseArgumentsIntoOptions(rawArgs) {
