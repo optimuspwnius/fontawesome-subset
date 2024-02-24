@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [6.0.8](https://github.com/optimuspwnius/fontawesome-subset/releases/tag/6.0.7)
+
+Report missing icons
+
 ## [6.0.7](https://github.com/optimuspwnius/fontawesome-subset/releases/tag/6.0.7)
 
 Changed sass import
