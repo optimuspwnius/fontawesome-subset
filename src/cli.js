@@ -146,6 +146,9 @@ async function copyAssets(options) {
   let uniqueIcons = [...new Set(aggregateIcons)]
   
   for (let icon of uniqueIcons) {
+    if (iconAliases[icon] === undefined)
+      console.log('Failed to find icon:', icon)
+
     if (iconAliases[icon].includes('brands'))
       brandIcons += '  ' + icon + ': $fa-var-' + icon + ',\n'
     else
